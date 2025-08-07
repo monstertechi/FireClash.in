@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireClash - Free Fire Tournament</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* General Styles */
+        :root {
+            --dark-bg: #1a1a2e;
+            --neon-blue: #00bcd4;
+            --neon-purple: #8A2BE2;
+            --neon-green: #39FF14;
+            --text-color: #f0f0f0;
+            --shadow-color-blue: rgba(0, 188, 212, 0.7);
+            --shadow-color-purple: rgba(138, 43, 226, 0.7);
+            --shadow-color-green: rgba(57, 255, 20, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll due to potential animations */
+        }
+
+        h1, h2 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        section {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1; /* Ensure content is above any background effects */
+        }
+
+        /* Hero Section */
+        .hero-section {
+            /* min-height: 100vh;  पुराना मान */
+            min-height: 70vh; /* कम जगह के लिए बदला गया */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #1a1a2e, #0a0a1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #fireclash-title {
+            font-size: 5rem;
+            /* color: transparent; पुराने कोड में था, अब हटा दिया गया ताकि blur ना हो */
+            color: var(--text-color); /* शुरुआत में ही टेक्स्ट दिखने के लिए */
+            text-shadow: 0 0 5px var(--neon-blue),
+                         0 0 10px var(--neon-blue),
+                         0 0 20px var(--neon-blue),
+                         0 0 40px var(--neon-blue),
+                         0 0 80px var(--neon-blue);
+            position: relative;
+            z-index: 1;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+
+        #fireclash-title span {
+            display: inline-block; /* For letter-by-letter animation */
+            /* opacity: 0; पुराने कोड में था, अब हटा दिया गया ताकि blur ना हो */
+            /* transform: translateY(20px); इसे GSAP से नियंत्रित किया जाएगा */
+        }
+
+        /* Counters Section */
+        .counters-section {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            text-align: center;
+            background-color: #2c2c4d;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
+            margin-top: -100px; /* Overlap with hero section for visual effect */
+            position: relative;
+            z-index: 2;
+        }
+
+        .counter-item {
+            flex: 1 1 280px;
+            padding: 20px;
+            background-color: #3b3b6b;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .counter-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .counter-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--neon-green);
+            display: block;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+        }
+
+        .counter-item p {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* Screenshots Section */
+        .screenshots-section {
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        .screenshots-section h2 {
+            font-size: 3rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .swiper-container {
+            width: 100%;
+            max-width: 900px; /* Adjust as needed */
+            height: 700px; /* Fixed height for slider */
+            margin: 50px auto;
+            padding-bottom: 50px; /* Space for pagination */
+            position: relative;
+        }
+
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .iphone-frame {
+            position: relative;
+            width: 350px; /* Adjust size of iPhone frame */
+            height: 700px; /* Adjust size of iPhone frame */
+            background-color: #000;
+            border-radius: 40px;
+            border: 10px solid #333;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 50px var(--shadow-color-purple);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* For rounded corners of screenshot */
+        }
+
+        /* iPhone Notch */
+        .iphone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background-color: #000;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 2;
+        }
+
+        /* iPhone Bottom Bar Indicator */
+        .iphone-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 5px;
+            z-index: 2;
+        }
+
+        .screenshot-img {
+            width: calc(100% - 20px); /* Adjust for internal padding/border effect */
+            height: calc(100% - 20px);
+            border-radius: 30px; /* Match iphone frame internal curve */
+            object-fit: cover;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* This transition is important for smooth GSAP animations */
+            transition: transform 0.3s ease-out;
+        }
+
+        /* Swiper navigation and pagination */
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--neon-green) !important;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            padding: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .swiper-button-next::after, .swiper-button-prev::after {
+            font-size: 1.5rem !important; /* Adjust arrow size */
+        }
+
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .swiper-pagination-bullet {
+            background: var(--neon-purple) !important;
+            opacity: 0.5;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: var(--neon-blue) !important;
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        /* Download Button Section */
+        .download-section {
+            text-align: center;
+            padding: 80px 20px;
+            background-color: #2c2c4d;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        }
+
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 40px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: var(--text-color);
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-shadow: 0 0 5px var(--text-color);
+            border: none;
+            z-index: 1; /* Ensure button content is above pseudo-element */
+        }
+
+        .download-button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 25px var(--neon-blue), 0 0 50px var(--neon-purple);
+        }
+
+        .download-button .arrow {
+            margin-left: 15px;
+            font-size: 2.5rem;
+            transition: transform 0.3s ease-out;
+            display: inline-block;
+        }
+
+        .download-button:hover .arrow {
+            transform: translateX(10px);
+        }
+
+        /* Animated gradient border (pulse effect handled by GSAP on box-shadow) */
+        .download-button::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-green), var(--neon-blue));
+            background-size: 400% 400%;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 1; /* Always visible for animation */
+            animation: gradientBorder 8s ease infinite;
+        }
+
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .download-link-note {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Footer */
+        .site-footer {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #111;
+            border-top: 1px solid rgba(0, 188, 212, 0.2);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .site-footer p {
+            margin-bottom: 5px;
+        }
+
+        .site-footer .privacy-link {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .site-footer .privacy-link:hover {
+            color: var(--neon-green);
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            #fireclash-title {
+                font-size: 3rem;
+            }
+
+            .hero-section {
+                min-height: 60vh; /* मोबाइल पर भी कम जगह */
+            }
+
+            .counters-section {
+                flex-direction: column;
+                padding: 30px;
+                margin-top: -50px;
+            }
+
+            .counter-item {
+                flex-basis: auto;
+                margin-bottom: 20px;
+            }
+
+            .counter-value {
+                font-size: 2.5rem;
+            }
+
+            .screenshots-section h2 {
+                font-size: 2rem;
+            }
+
+            .swiper-container {
+                height: 600px; /* Adjust height for smaller screens */
+                max-width: 95%;
+            }
+
+            .iphone-frame {
+                width: 250px;
+                height: 500px;
+                border-radius: 30px;
+                border-width: 8px;
+            }
+
+            .iphone-frame::before {
+                width: 100px;
+                height: 25px;
+            }
+
+            .screenshot-img {
+                border-radius: 22px;
+            }
+
+            .download-button {
+                font-size: 1.5rem;
+                padding: 15px 30px;
+            }
+
+            .download-button .arrow {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #fireclash-title {
+                font-size: 2.2rem;
+                text-align: center;
+                line-height: 1.2;
+            }
+
+            .hero-section {
+                min-height: 50vh; /* सबसे छोटे मोबाइल पर भी कम जगह */
+            }
+
+            .counters-section {
+                padding: 20px;
+                margin-top: -30px;
+            }
+
+            .counter-value {
+                font-size: 2rem;
+            }
+
+            .counter-item p {
+                font-size: 1rem;
+            }
+
+            .swiper-container {
+                height: 450px; /* Further adjust height */
+            }
+
+            .iphone-frame {
+                width: 200px;
+                height: 400px;
+                border-radius: 25px;
+                border-width: 6px;
+            }
+
+            .iphone-frame::before {
+                width: 80px;
+                height: 20px;
+            }
+
+            .screenshot-img {
+                border-radius: 18px;
+            }
+
+            .download-button {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+
+            .download-button .arrow {
+                font-size: 1.8rem;
+            }
+
+            .site-footer {
+                padding: 20px 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section with Animated Title -->
+    <header class="hero-section">
+        <h1 id="fireclash-title">FireClash</h1>
+    </header>
+
+    <!-- Animated Counters Section -->
+    <section class="counters-section">
+        <div class="counter-item" data-aos="fade-up">
+            <span class="counter-value" data-target="1000" data-animation="shake">100</span>
+            <p>Tournaments Hosted</p>
+        </div>
+        <div class="counter-item" data-aos="fade-up" data-aos-delay="100">
+            <span class="counter-value" data-target="1000" data-animation="zoom">100</span>
+            <p>Tournaments Played</p>
+        </div>
+        <div class="counter-item" data-aos="fade-up" data-aos-delay="200">
+            <span class="counter-value" data-target="5000" data-animation="slide">1000</span>
+            <p>Daily Winners</p>
+        </div>
+    </section>
+
+    <!-- Screenshots Section with Swiper Slider -->
+    <section class="screenshots-section">
+        <h2 data-aos="fade-up">App Screenshots</h2>
+        <div class="swiper-container" data-aos="zoom-in">
+           <div class="swiper-wrapper">
+    <div class="swiper-slide">
+        <div class="iphone-frame">
+            <img src="https://i.ibb.co/TxkCjXJw/Screenshot-20250807-213118.jpg" alt="App Screenshot 1" class="screenshot-img">
+        </div>
+    </div>
+    <div class="swiper-slide">
+        <div class="iphone-frame">
+            <img src="https://i.ibb.co/Jwf4NGLM/Screenshot-20250807-213122.jpg" alt="App Screenshot 2" class="screenshot-img">
+        </div>
+    </div>
+    <div class="swiper-slide">
+        <div class="iphone-frame">
+            <img src="https://i.ibb.co/MDWjk0S8/Screenshot-20250807-213147.jpg" alt="App Screenshot 3" class="screenshot-img">
+        </div>
+    </div>
+    <div class="swiper-slide">
+        <div class="iphone-frame">
+            <img src="https://i.ibb.co/sd0PXFRC/Screenshot-20250807-213159.jpg" alt="App Screenshot 4" class="screenshot-img">
+        </div>
+    </div>
+</div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
+            <!-- Add Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </section>
+
+    <!-- Download Button Section -->
+    <section class="download-section">
+        <a href="#" id="download-button" class="download-button" data-aos="zoom-in">
+            Download Now
+            <span class="arrow">&#x2192;</span>
+        </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p><a href="#" class="privacy-link">Privacy Policy</a></p>
+        <p>All rights reserved &copy; 2024 By FireClash</p>
+    </footer>
+
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize AOS (Animate On Scroll)
+            AOS.init({
+                duration: 1000, // Animation duration
+                once: true,    // Only animate once on scroll down
+                mirror: false, // Do not repeat animation on scroll up
+            });
+
+            // GSAP for FireClash Title Animation (Letter by letter entrance + glowing)
+            const titleElement = document.getElementById('fireclash-title');
+            const titleText = titleElement.textContent;
+            titleElement.innerHTML = ''; // Clear original text
+
+            // Create a span for each letter for individual animation control
+            Array.from(titleText).forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                // span.style.color = 'transparent'; इसे हटा दिया गया है ताकि शुरुआत में टेक्स्ट blur ना हो
+                titleElement.appendChild(span);
+            });
+
+            // GSAP Timeline for sequential letter animation and pulsing glow
+            gsap.timeline()
+                .fromTo(titleElement.querySelectorAll('span'),
+                    { y: 20 }, // Start state: slightly below (अब opacity: 0 नहीं है)
+                    {
+                        y: 0,
+                        stagger: 0.08, // Delay between each letter's animation
+                        ease: 'back.out(1.7)', // Smooth bouncy entrance
+                        duration: 1,
+                    }
+                )
+                .to(titleElement.querySelectorAll('span'),
+                    {
+                        // Glow effect by animating text-shadow and color
+                        textShadow: '0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 80px var(--neon-blue)',
+                        color: 'var(--text-color)', // Animate color to white/faded white
+                        duration: 0.5,
+                        stagger: 0.05,
+                        repeat: -1, // Infinite glow pulse
+                        yoyo: true, // Go back and forth (pulse effect)
+                        ease: 'power1.inOut',
+                    }, '-=0.5' // Start glow animation slightly before entrance finishes
+                );
+
+
+            // GSAP for Animated Counters with ScrollTrigger
+            gsap.registerPlugin(ScrollTrigger);
+
+            const counterItems = document.querySelectorAll('.counter-item');
+
+            counterItems.forEach(item => {
+                const valueDisplay = item.querySelector('.counter-value');
+                const target = parseInt(valueDisplay.dataset.target); // Get target value from data-target
+                const start = parseInt(valueDisplay.textContent);    // Get initial value
+
+                // Create a GSAP timeline for each counter
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: item,
+                        start: 'top 80%', // Animation starts when top of item enters 80% of viewport
+                        end: 'bottom 20%', // Animation ends when bottom of item leaves 20% of viewport
+                        toggleActions: 'play none none none', // Play animation only once when scrolling down
+                        // markers: true, // Uncomment for debugging scroll triggers
+                    }
+                });
+
+                // Main counting animation
+                tl.from({ count: start }, {
+                    count: target,
+                    duration: 2,
+                    roundProps: 'count', // Ensures integer values
+                    onUpdate: function () {
+                        valueDisplay.textContent = Math.round(this.vars.count); // Update text
+                    },
+                    ease: 'power1.out'
+                });
+
+                // Add specific animation based on data-animation attribute
+                const animationType = valueDisplay.dataset.animation;
+                if (animationType === 'shake') {
+                    tl.to(valueDisplay, {
+                        x: 10, // Move 10px right
+                        repeat: 3,
+                        yoyo: true, // Move back and forth
+                        duration: 0.1, // Quick shake
+                        ease: 'power1.inOut'
+                    }, "<"); // "<" means start this animation at the same time as the previous one (counting)
+                } else if (animationType === 'zoom') {
+                    tl.fromTo(valueDisplay,
+                        { scale: 0.8 }, // Start slightly smaller
+                        {
+                            scale: 1.1, // Zoom slightly larger
+                            repeat: 3,
+                            yoyo: true,
+                            duration: 0.1,
+                            ease: 'power1.inOut'
+                        }, "<");
+                } else if (animationType === 'slide') {
+                    tl.fromTo(valueDisplay,
+                        { x: -10 }, // Start 10px left
+                        {
+                            x: 10, // Move 10px right
+                            repeat: 3,
+                            yoyo: true,
+                            duration: 0.1,
+                            ease: 'power1.inOut'
+                        }, "<");
+                }
+            });
+
+            // Swiper.js for Screenshot Slider
+            const screenshotSwiper = new Swiper('.swiper-container', {
+                loop: true, // Enable infinite loop
+                slidesPerView: 1,
+                spaceBetween: 30,
+                effect: 'slide',
+                centeredSlides: true, // Center active slide
+                autoplay: {
+                    delay: 5000, // 5 seconds delay
+                    disableOnInteraction: false, // Continue autoplay even after user interaction
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true, // Allow clicking bullets to navigate
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    // Responsive settings for Swiper
+                    768: {
+                        slidesPerView: 1.5, // Show part of next/prev slide on larger screens
+                    },
+                    1024: {
+                        slidesPerView: 2, // Show more slides
+                    }
+                },
+                on: {
+                    // Custom animations on slide change
+                    slideChangeTransitionStart: function () {
+                        // Apply shake animation to the active slide's screenshot
+                        const activeSlide = this.slides[this.activeIndex];
+                        const screenshotImg = activeSlide.querySelector('.screenshot-img');
+                        if (screenshotImg) {
+                            gsap.fromTo(screenshotImg,
+                                { x: 0 }, // Start at no horizontal offset
+                                {
+                                    x: 5, // Shake 5px right
+                                    yoyo: true, // Shake back left
+                                    repeat: 3, // Repeat 3 times (total 6 movements)
+                                    duration: 0.08, // Quick shake
+                                    ease: 'power1.inOut',
+                                    onComplete: () => gsap.to(screenshotImg, { x: 0, duration: 0.1 }) // Ensure it returns to center
+                                }
+                            );
+                        }
+                    },
+                    // Move only the screenshot image within its phone frame during slide transition
+                    setTranslate: function () {
+                        this.slides.forEach(slide => {
+                            const img = slide.querySelector('.screenshot-img');
+                            if (img) {
+                                // slide.progress: -1 for prev, 0 for current, 1 for next (during transition)
+                                const slideProgress = slide.progress;
+                                // Calculate offset based on slide progress
+                                const offset = slideProgress * 50; // Adjust 50 for desired movement amplitude
+                                gsap.to(img, { x: -offset, duration: 0.5, ease: 'power1.out' });
+                            }
+                        });
+                    }
+                }
+            });
+
+            // GSAP for Download Button Animations
+            const downloadButton = document.getElementById('download-button');
+
+            // Pulsing effect for the download button (on box-shadow)
+            gsap.to(downloadButton, {
+                scale: 1.02, // Slightly enlarge
+                boxShadow: '0 0 15px var(--neon-blue), 0 0 30px var(--neon-purple)', // Apply glow
+                repeat: -1, // Infinite repeat
+                yoyo: true, // Go back and forth (pulse)
+                duration: 1.5, // Duration of one pulse cycle
+                ease: 'power1.inOut'
+            });
+
+            // --- IMPORTANT: Update Your Download Link Here ---
+            // Change this URL to your actual app download link (e.g., Google Play, App Store, APK link)
+            const downloadLink = "FireClash.apk";
+            downloadButton.href = downloadLink;
+        });
+    </script>
+</body>
+</html>
